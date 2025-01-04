@@ -4,6 +4,7 @@ CHROMA_PATH = ".chroma"  # Path to store the Chroma database
 CACHE_PATH = ".cache"  # Path to store the scrape cache
 WEB_URL = "https://clc.hust.edu.vn/vstep/vstep-la-gi/"  # Website URL
 WEB_URLS = [
+    "https://clc.hust.edu.vn/vstep/vstep-la-gi/",
     "https://etc.sgu.edu.vn/gioi-thieu/",
     "https://vi.wikipedia.org/wiki/VSTEP",
     "https://vi.wikipedia.org/wiki/Khung_n%C4%83ng_l%E1%BB%B1c_ngo%E1%BA%A1i_ng%E1%BB%AF_6_b%E1%BA%ADc_d%C3%B9ng_cho_Vi%E1%BB%87t_Nam",

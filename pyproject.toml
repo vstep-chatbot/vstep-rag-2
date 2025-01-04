@@ -18,3 +18,6 @@ dependencies = [
     "ruff>=0.8.3",
     "vncorenlp>=1.0.3",
 ]
+
+[tool.uv]
+cache-dir = "/media/nam/Data/.cache/uv"

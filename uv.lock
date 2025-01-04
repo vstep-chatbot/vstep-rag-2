@@ -1483,41 +1483,6 @@ wheels = [
 ]
 
 [[package]]
-name = "llm-rag-2"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "chonkie", extra = ["semantic"] },
-    { name = "docling" },
-    { name = "firecrawl-py" },
-    { name = "flask" },
-    { name = "langchain-chroma" },
-    { name = "langchain-community" },
-    { name = "langchain-core" },
-    { name = "langchain-huggingface" },
-    { name = "langchain-together" },
-    { name = "python-dotenv" },
-    { name = "ruff" },
-    { name = "vncorenlp" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "chonkie", extras = ["semantic"], specifier = ">=0.2.2" },
-    { name = "docling", specifier = ">=2.14.0" },
-    { name = "firecrawl-py", specifier = ">=1.6.8" },
-    { name = "flask", specifier = ">=3.1.0" },
-    { name = "langchain-chroma", specifier = ">=0.1.4" },
-    { name = "langchain-community", specifier = ">=0.3.12" },
-    { name = "langchain-core", specifier = ">=0.3.25" },
-    { name = "langchain-huggingface", specifier = ">=0.1.2" },
-    { name = "langchain-together", specifier = ">=0.2.0" },
-    { name = "python-dotenv", specifier = ">=1.0.1" },
-    { name = "ruff", specifier = ">=0.8.3" },
-    { name = "vncorenlp", specifier = ">=1.0.3" },
-]
-
-[[package]]
 name = "lxml"
 version = "5.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4103,6 +4068,41 @@ dependencies = [
     { name = "requests" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/71/c2/96a60cf75421ecc740829fa920c617b3dd7fa6791e17554e7c6f3e7d7fca/vncorenlp-1.0.3.tar.gz", hash = "sha256:c307c7ff108d2a74436d877246f237300ce465b52d7556c00e3d47d01bff1f1d", size = 2648781 }
+
+[[package]]
+name = "vstep-rag-2"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "chonkie", extra = ["semantic"] },
+    { name = "docling" },
+    { name = "firecrawl-py" },
+    { name = "flask" },
+    { name = "langchain-chroma" },
+    { name = "langchain-community" },
+    { name = "langchain-core" },
+    { name = "langchain-huggingface" },
+    { name = "langchain-together" },
+    { name = "python-dotenv" },
+    { name = "ruff" },
+    { name = "vncorenlp" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "chonkie", extras = ["semantic"], specifier = ">=0.2.2" },
+    { name = "docling", specifier = ">=2.14.0" },
+    { name = "firecrawl-py", specifier = ">=1.6.8" },
+    { name = "flask", specifier = ">=3.1.0" },
+    { name = "langchain-chroma", specifier = ">=0.1.4" },
+    { name = "langchain-community", specifier = ">=0.3.12" },
+    { name = "langchain-core", specifier = ">=0.3.25" },
+    { name = "langchain-huggingface", specifier = ">=0.1.2" },
+    { name = "langchain-together", specifier = ">=0.2.0" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "ruff", specifier = ">=0.8.3" },
+    { name = "vncorenlp", specifier = ">=1.0.3" },
+]
 
 [[package]]
 name = "watchfiles"

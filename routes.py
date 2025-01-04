@@ -58,3 +58,23 @@ def setup_routes(app):
             return jsonify({"response": response, "chunks": page_contents}), 200
         else:
             return jsonify({"error": "Không thể sinh ra câu trả lời."}), 500
+
+    @app.route("/get_chunks", methods=["GET"])
+    def get_chunks():
+        """
+        Retrieves all chunks from the nested list of Document objects and returns them as a list of strings.
+        """
+        # Get data from the Chroma database
+        if (is_chroma_db_empty(chroma_db)):
+            print("Chroma database is empty.")
+            return jsonify({"error": "Chroma database is empty."}), 500
+
+        data = chroma_db.get(include=["documents"])
+
+        # Extract the documents from the data
+        documents = data["documents"]
+
+        # Extract the page content from each document
+        chunks = [doc for doc in documents]
+
+        return jsonify(chunks), 200
