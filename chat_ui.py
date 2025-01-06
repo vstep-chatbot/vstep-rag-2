@@ -1,5 +1,5 @@
 from re import I
-from typing import List
+from typing import Iterator, List
 import gradio as gr
 from llama_cpp import ChatCompletionRequestMessage, Llama
 
@@ -13,8 +13,8 @@ model = Llama(
 
 
 def generate_response_local(chat_history: List[ChatCompletionRequestMessage]):
-    response = model.create_chat_completion(chat_history)
-    return response
+    for chunk in model.create_chat_completion(chat_history, stream=True):
+        yield chunk
 
 
 with gr.Blocks() as demo:
@@ -41,18 +41,16 @@ with gr.Blocks() as demo:
                 local_results = get_top_k_chunks(chroma_db, message, 3)
                 prompt = design_prompt_raft(local_results, message)
 
-                chat_history.append({"role": "user", "content": prompt})
+                temp_history = chat_history + [{"role": "user", "content": prompt}]
 
-                response = generate_response_local(chat_history)
+                chat_history.append({"role": "user", "content": message})
 
-                output = response["choices"][0]["message"]
-
-                if output is not None:
-                    chat_history.pop()
-                    chat_history.append({"role": "user", "content": message})
-                    chat_history.append(output)
-
-                return "", chat_history, local_results
+                chat_history.append({"role": "assistant", "content": ""})
+                for chunk in generate_response_local(temp_history):
+                    content_piece = chunk["choices"][0]["delta"].get("content", "")
+                    if content_piece:
+                        chat_history[-1]["content"] += content_piece
+                        yield "", chat_history, local_results
 
             msg.submit(respond, [msg, chatbot], [msg, chatbot, results])
 

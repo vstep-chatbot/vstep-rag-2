@@ -41,7 +41,7 @@ def generate_response(prompt):
     return response
 
 
-def design_prompt_raft(results: List[Tuple[Document, float]], user_input):
+def design_prompt_raft(results: List[Tuple[Document, float]], user_input) -> str:
     prompt = ""
 
     for doc in results:
