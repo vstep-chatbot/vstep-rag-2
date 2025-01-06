@@ -13,8 +13,7 @@ model = Llama(
 
 
 def generate_response_local(chat_history: List[ChatCompletionRequestMessage]):
-    for chunk in model.create_chat_completion(chat_history, stream=True):
-        yield chunk
+    return model.create_chat_completion(chat_history, stream=True)
 
 
 with gr.Blocks() as demo:
@@ -37,6 +36,8 @@ with gr.Blocks() as demo:
                         "content": "Bạn là nhân viên hỗ trợ cho kỳ thi VSTEP, bạn trả lời câu hỏi và thuyết phục user đăng ký thi VSTEP.",
                     }
                 ]
+
+                print(chat_history)
 
                 local_results = get_top_k_chunks(chroma_db, message, 3)
                 prompt = design_prompt_raft(local_results, message)
