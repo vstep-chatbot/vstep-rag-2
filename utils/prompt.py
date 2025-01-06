@@ -1,5 +1,6 @@
 import logging
 from typing import List, Tuple
+
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_together import ChatTogether
@@ -11,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def design_prompt(results : List[Tuple[Document, float]], user_input):
+def design_prompt(results: List[Tuple[Document, float]], user_input):
     result_docs = [doc.page_content for doc, _ in results]
     context_text = "\n########".join(result_docs)
 
@@ -38,3 +39,14 @@ def generate_response(prompt):
     # response = model.invoke(prompt)
     response = model.invoke(prompt).content
     return response
+
+
+def design_prompt_raft(results: List[Tuple[Document, float]], user_input):
+    prompt = ""
+
+    for doc in results:
+        prompt += "<DOCUMENT>" + doc[0].page_content.strip() + "</DOCUMENT>"
+
+    prompt += user_input
+
+    return prompt

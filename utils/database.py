@@ -4,10 +4,21 @@ import os
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
+from BAAI.embedding_func import get_embedding_function
 from config import CACHE_PATH, CHROMA_PATH
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+chroma_db = Chroma(
+    persist_directory=CHROMA_PATH,
+    embedding_function=get_embedding_function(),
+    collection_metadata={"hnsw:space": "cosine"},
+)
+
+
+def get_instance():
+    return chroma_db
 
 
 def add_chunks_to_chroma(chroma_db: Chroma, chunks: list[Document]):
@@ -33,6 +44,7 @@ def add_chunks_to_chroma(chroma_db: Chroma, chunks: list[Document]):
         # chroma_db.persist()
     else:
         logger.info("✅ No new documents to add")
+
 
 def calculate_chunk_ids(chunks):
     # This will create IDs like "https://example.com/:6:2"
@@ -70,7 +82,7 @@ def get_top_k_chunks(chroma_db: Chroma, query_text, k=5):
     logging.info(f"Top {k} chunks retrieved.")
     for doc, score in results:
         logging.info(f"Score: {score}")
-        logging.info(f"Page Content: {doc.page_content[:100]}")
+        logging.info(f"Page Content: {doc.page_content[:80]}")
 
     return results
 

@@ -1,25 +1,20 @@
 import logging
 from flask import jsonify, request
-from langchain_chroma import Chroma
-
-from BAAI.embedding_func import get_embedding_function
 from BAAI.chunking import split_document
 from config import CHROMA_PATH, WEB_URLS
-from utils.database import get_top_k_chunks, is_chroma_db_empty
+from utils.database import get_instance, get_top_k_chunks, is_chroma_db_empty
 from utils.prompt import design_prompt, generate_response
 from utils.scrape import scrape_website
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def setup_routes(app):
     logger.info("Setting up Chroma database...")
     logger.info("CHROMA_PATH: " + CHROMA_PATH)
-    chroma_db = Chroma(
-        persist_directory=CHROMA_PATH,
-        embedding_function=get_embedding_function(),
-        collection_metadata={"hnsw:space": "cosine"},
-    )
+
+    chroma_db = get_instance()
 
     if is_chroma_db_empty(chroma_db):
         for index, source in enumerate(WEB_URLS):
@@ -65,7 +60,7 @@ def setup_routes(app):
         Retrieves all chunks from the nested list of Document objects and returns them as a list of strings.
         """
         # Get data from the Chroma database
-        if (is_chroma_db_empty(chroma_db)):
+        if is_chroma_db_empty(chroma_db):
             print("Chroma database is empty.")
             return jsonify({"error": "Chroma database is empty."}), 500
 
