@@ -6,21 +6,25 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_together import ChatTogether
 
 from config import PROMPT_TEMPLATE
-from utils.scrape import writeFile
+from utils.scrape import writeCache
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def design_prompt(results: List[Tuple[Document, float]], user_input):
+def design_prompt(results: List[Tuple[Document, float]], user_input: str):
     result_docs = [doc.page_content for doc, _ in results]
-    context_text = "\n########".join(result_docs)
+
+    context_text = ""
+    for doc in result_docs:
+        context_text += "#######" + doc.strip() + "\n"
+    context_text += "#######"
 
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
 
     prompt = prompt_template.format(context=context_text, question=user_input)
 
-    writeFile(".prompt", prompt)
+    writeCache(".prompt", prompt)
     return prompt
 
 
@@ -44,8 +48,8 @@ def generate_response(prompt):
 def design_prompt_raft(results: List[Tuple[Document, float]], user_input) -> str:
     prompt = ""
 
-    for doc in results:
-        prompt += "<DOCUMENT>" + doc[0].page_content.strip() + "</DOCUMENT>"
+    for tuple in results:
+        prompt += "<DOCUMENT>" + tuple[0].page_content.strip() + "</DOCUMENT>"
 
     prompt += user_input
 

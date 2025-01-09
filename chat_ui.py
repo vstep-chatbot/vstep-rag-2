@@ -1,5 +1,5 @@
-from re import I
-from typing import Iterator, List
+from typing import List
+
 import gradio as gr
 from llama_cpp import ChatCompletionRequestMessage, Llama
 
@@ -37,9 +37,7 @@ with gr.Blocks() as demo:
                     }
                 ]
 
-                print(chat_history)
-
-                local_results = get_top_k_chunks(chroma_db, message, 3)
+                local_results = get_top_k_chunks(chroma_db, message, k=5)
                 prompt = design_prompt_raft(local_results, message)
 
                 temp_history = chat_history + [{"role": "user", "content": prompt}]

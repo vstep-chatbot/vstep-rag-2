@@ -18,3 +18,5 @@ wheels/
 .chroma/
 .ropeproject/
 models
+unsloth.Q8_0.gguf
+VnCoreNLP-1.2.jar

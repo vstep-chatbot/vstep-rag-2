@@ -1,10 +1,14 @@
 import logging
+
 from flask import jsonify, request
-from BAAI.chunking import split_document
-from config import CHROMA_PATH, WEB_URLS
+
+from config import CHROMA_PATH, FORCE_FIRECRAWL_URLS, WEB_URLS
+from phoBERT.chunking import split_document
 from utils.database import get_instance, get_top_k_chunks, is_chroma_db_empty
 from utils.prompt import design_prompt, generate_response
+from utils.reranker import rerank_results
 from utils.scrape import scrape_website
+from utils.vncorenlp_tokenizer import word_segment
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -30,6 +34,19 @@ def setup_routes(app):
 
             chroma_db.add_documents(chunks)
 
+        for index, source in enumerate(FORCE_FIRECRAWL_URLS):
+            logger.info(f"Scraping Firecrawl {index}: {source[7:80]}")
+
+            web_document = scrape_website(source, index, use_firecrawl=True)
+
+            if not web_document:
+                logger.error(f"Error scraping: {source}")
+                continue
+
+            chunks = split_document(web_document)
+
+            chroma_db.add_documents
+
     logger.info("Chroma database setup complete.")
 
     @app.route("/query_llm", methods=["POST"])
@@ -42,15 +59,23 @@ def setup_routes(app):
         if not user_input:
             return jsonify({"error": "No query provided"}), 400
 
-        results = get_top_k_chunks(chroma_db, user_input, 3)
+        segmented_input = word_segment(user_input)
+
+        results = get_top_k_chunks(chroma_db, segmented_input, 5)
+        # sorted_results = rerank_results(results, segmented_input)
 
         prompt = design_prompt(results, user_input)
 
         response = generate_response(prompt)
-        page_contents = [doc.page_content for doc, _ in results]
 
         if response:
-            return jsonify({"response": response, "chunks": page_contents}), 200
+            return jsonify(
+                {
+                    "input": segmented_input,
+                    "response": response,
+                    "chunks": [[doc.page_content, eval(str(score))] for doc, score in results],
+                }
+            ), 200
         else:
             return jsonify({"error": "Không thể sinh ra câu trả lời."}), 500
 

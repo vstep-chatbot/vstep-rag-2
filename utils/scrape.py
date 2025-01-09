@@ -1,7 +1,7 @@
-
 import logging
-from os import getenv
 import os
+from os import getenv
+
 from docling.document_converter import DocumentConverter
 from dotenv import load_dotenv
 from firecrawl import FirecrawlApp
@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 firecrawlApp = FirecrawlApp(api_key=getenv("FIRECRAWL_API_KEY"))
 
-def writeFile(filename: str, content: str) -> None:
 
+def writeCache(filename: str, content: str) -> None:
     if not os.path.exists(CACHE_PATH):
         os.makedirs(CACHE_PATH)
 
@@ -25,26 +25,46 @@ def writeFile(filename: str, content: str) -> None:
         file.write(content)
 
 
-def scrape_website(url=WEB_URL, id = 0):
+def scrape_website(url=WEB_URL, id=0, use_firecrawl=False) -> Document:
     logger.info("Scraping: " + url)
 
     converter = DocumentConverter()
     web_document = None
 
     try:
+        if use_firecrawl:
+            raise Exception("Forcing Firecrawl")
+
+        if os.path.exists(f"{CACHE_PATH}/{id}.md"):
+            logger.info("Using cache")
+            with open(f"{CACHE_PATH}/{id}.md", "r") as file:
+                content = file.read()
+                web_document = Document(page_content=content, metadata={"source": url})
+                return web_document
+
         result = converter.convert(url)
-        writeFile(f"{id}.md", result.document.export_to_markdown(strict_text=True))
-        web_document = Document(page_content=result.document.export_to_markdown(strict_text=True), metadata={"source": url})
+        markdown = result.document.export_to_markdown(strict_text=True, image_placeholder="").replace(
+            "<missing-text>\n", ""
+        )
+        writeCache(f"{id}.md", markdown)
+        web_document = Document(page_content=markdown, metadata={"source": url})
     except Exception as e:
         logger.error(f"Error Scraping Docling: {e}")
+
+        if os.path.exists(f"{CACHE_PATH}/{id}-firecrawl.md"):
+            logger.info("Using cache")
+            with open(f"{CACHE_PATH}/{id}-firecrawl.md", "r") as file:
+                content = file.read()
+                web_document = Document(page_content=content, metadata={"source": url})
+                return web_document
 
         try:
             scrape_result = firecrawlApp.scrape_url(url, params={"formats": ["markdown"]})
             if "markdown" not in scrape_result:
                 raise Exception("No markdown content in scrape result")
-            writeFile(f"{id}-firecrawl.md", scrape_result['markdown'])
+            writeCache(f"{id}-firecrawl.md", scrape_result["markdown"])
 
-            web_document = Document(page_content=scrape_result['markdown'], metadata={"source": url})
+            web_document = Document(page_content=scrape_result["markdown"], metadata={"source": url})
 
         except Exception as e:
             logger.error(f"Error Firecrawl: {e}")

@@ -1,21 +1,26 @@
-from uuid import uuid4
-from chonkie import SemanticChunker
-from langchain_core.documents import Document
 import logging
+from uuid import uuid4
 
-chunker = SemanticChunker(
-    embedding_model="BAAI/bge-m3",
-    threshold=0.5,  # Similarity threshold (0-1)
-    chunk_size=512,  # Maximum tokens per chunk
-    similarity_window=1,  # Initial sentences per chunk
-)
+from langchain_core.documents import Document
+from langchain_experimental.text_splitter import SemanticChunker
+
+from phoBERT.embedding_func import get_embedding_function
+from utils.vncorenlp_tokenizer import word_segment
+
+chunker = SemanticChunker(embeddings=get_embedding_function())
 
 
 def split_document(document: Document) -> list[Document]:
-    if document.metadata['source'] is None or document.metadata['source'] == "":
+    if document.metadata["source"] is None or document.metadata["source"] == "":
         logging.error("Document must have a source.")
         return []
 
-    chunks = chunker.chunk(document.page_content)
+    annotated_text = word_segment(document.page_content)
 
-    return [Document(page_content=chunk.text, metadata={"source": document.metadata['source']}, id=uuid4()) for chunk in chunks]
+    documents = chunker.create_documents([annotated_text])
+
+    for chunk in documents:
+        chunk.metadata["id"] = str(uuid4())
+        chunk.metadata["source"] = document.metadata["source"]
+
+    return documents

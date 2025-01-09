@@ -4,8 +4,8 @@ import os
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
-from BAAI.embedding_func import get_embedding_function
 from config import CACHE_PATH, CHROMA_PATH
+from phoBERT.embedding_func import get_embedding_function
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -76,7 +76,7 @@ def clear_database():
     return True
 
 
-def get_top_k_chunks(chroma_db: Chroma, query_text, k=5):
+def get_top_k_chunks(chroma_db: Chroma, query_text, k=5) -> list[tuple[Document, float]]:
     results = chroma_db.similarity_search_with_score(query_text, k=k)
 
     logging.info(f"Top {k} chunks retrieved.")
