@@ -2,12 +2,8 @@ import logging
 
 from flask import jsonify, request
 
-from config import CHROMA_PATH, FORCE_FIRECRAWL_URLS, WEB_URLS
-from phoBERT.chunking import split_document
 from utils.database import get_instance, get_top_k_chunks, is_chroma_db_empty
 from utils.prompt import design_prompt, generate_response
-from utils.reranker import rerank_results
-from utils.scrape import scrape_website
 from utils.vncorenlp_tokenizer import word_segment
 
 logging.basicConfig(level=logging.INFO)
@@ -15,39 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def setup_routes(app):
-    logger.info("Setting up Chroma database...")
-    logger.info("CHROMA_PATH: " + CHROMA_PATH)
-
     chroma_db = get_instance()
-
-    if is_chroma_db_empty(chroma_db):
-        for index, source in enumerate(WEB_URLS):
-            logger.info(f"Scraping {index}: {source[7:80]}")
-
-            web_document = scrape_website(source, index)
-
-            if not web_document:
-                logger.error(f"Error scraping: {source}")
-                continue
-
-            chunks = split_document(web_document)
-
-            chroma_db.add_documents(chunks)
-
-        for index, source in enumerate(FORCE_FIRECRAWL_URLS):
-            logger.info(f"Scraping Firecrawl {index}: {source[7:80]}")
-
-            web_document = scrape_website(source, index, use_firecrawl=True)
-
-            if not web_document:
-                logger.error(f"Error scraping: {source}")
-                continue
-
-            chunks = split_document(web_document)
-
-            chroma_db.add_documents
-
-    logger.info("Chroma database setup complete.")
 
     @app.route("/query_llm", methods=["POST"])
     def query_llm():

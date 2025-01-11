@@ -17,7 +17,7 @@ def design_prompt(results: List[Tuple[Document, float]], user_input: str):
 
     context_text = ""
     for doc in result_docs:
-        context_text += "#######" + doc.strip() + "\n"
+        context_text += "#######\n" + doc.strip() + "\n"
     context_text += "#######"
 
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)

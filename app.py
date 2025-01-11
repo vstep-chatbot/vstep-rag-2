@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from routes import setup_routes
 from utils.database import clear_database
+from utils.setup_chroma_db import setup_chroma_db
 
 app = Flask(__name__)
 
@@ -31,6 +32,7 @@ def parse_arguments():
 
 if __name__ == "__main__":
     handle_arguments()
+    setup_chroma_db()
     setup_routes(app)
     logger.info("Setting up routes...")
     app.run(host="0.0.0.0", port=5000)

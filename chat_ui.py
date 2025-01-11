@@ -5,9 +5,13 @@ from llama_cpp import ChatCompletionRequestMessage, Llama
 
 from utils.database import get_instance, get_top_k_chunks
 from utils.prompt import design_prompt_raft
+from utils.setup_chroma_db import setup_chroma_db
+from utils.vncorenlp_tokenizer import word_segment
+
+setup_chroma_db()
 
 model = Llama(
-    model_path="models/unsloth.Q8_0.gguf",
+    model_path="unsloth.Q8_0.gguf",
     n_ctx=8192,
 )
 
@@ -37,7 +41,10 @@ with gr.Blocks() as demo:
                     }
                 ]
 
-                local_results = get_top_k_chunks(chroma_db, message, k=5)
+                segmented_input = word_segment(message)
+
+                local_results = get_top_k_chunks(chroma_db, segmented_input, k=5)
+                # sorted_results = rerank_results(results, segmented_input)
                 prompt = design_prompt_raft(local_results, message)
 
                 temp_history = chat_history + [{"role": "user", "content": prompt}]
