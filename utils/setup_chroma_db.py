@@ -41,6 +41,6 @@ def setup_chroma_db():
 
             chunks = split_document(web_document)
 
-            chroma_db.add_documents
+            chroma_db.add_documents(chunks)
 
-    logger.info("Chroma database setup complete.")
+    logger.info("Chroma database setup complete with " + str(len(chroma_db.get()['documents'])) + " documents.")
