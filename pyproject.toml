@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "datasets>=3.2.0",
     "docling>=2.14.0",
     "firecrawl-py>=1.6.8",
     "flask>=3.1.0",
@@ -15,6 +16,7 @@ dependencies = [
     "langchain-experimental>=0.3.4",
     "langchain-huggingface>=0.1.2",
     "langchain-together>=0.2.0",
+    "llama-cpp-python>=0.3.6",
     "py-vncorenlp>=0.1.4",
     "python-dotenv>=1.0.1",
 ]

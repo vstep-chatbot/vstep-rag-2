@@ -1,7 +1,7 @@
 from typing import List
 
 import gradio as gr
-from llama_cpp import ChatCompletionRequestMessage, Llama
+from llama_cpp import ChatCompletionRequestMessage
 
 from utils.database import get_instance, get_top_k_chunks
 from utils.prompt import design_prompt_raft
@@ -9,16 +9,6 @@ from utils.setup_chroma_db import setup_chroma_db
 from utils.vncorenlp_tokenizer import word_segment
 
 setup_chroma_db()
-
-model = Llama(
-    model_path="unsloth.Q8_0.gguf",
-    n_ctx=8192,
-)
-
-
-def generate_response_local(chat_history: List[ChatCompletionRequestMessage]):
-    return model.create_chat_completion(chat_history, stream=True)
-
 
 with gr.Blocks() as demo:
     with gr.Row():

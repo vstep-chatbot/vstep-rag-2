@@ -1,9 +1,10 @@
 import logging
+import os
 
 from flask import jsonify, request
 
 from utils.database import get_instance, get_top_k_chunks, is_chroma_db_empty
-from utils.prompt import design_prompt, generate_response
+from utils.prompt import design_prompt, design_prompt_raft, generate_response
 from utils.vncorenlp_tokenizer import word_segment
 
 logging.basicConfig(level=logging.INFO)
@@ -28,7 +29,7 @@ def setup_routes(app):
         results = get_top_k_chunks(chroma_db, segmented_input, 5)
         # sorted_results = rerank_results(results, segmented_input)
 
-        prompt = design_prompt(results, user_input)
+        prompt = design_prompt_raft(results, user_input) if os.getenv("LOCAL_MODEL") else design_prompt(results, user_input)
 
         response = generate_response(prompt)
 

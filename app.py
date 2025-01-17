@@ -3,6 +3,7 @@ import logging
 
 from dotenv import load_dotenv
 from flask import Flask
+
 from routes import setup_routes
 from utils.database import clear_database
 from utils.setup_chroma_db import setup_chroma_db
