@@ -2,6 +2,8 @@ from typing import List
 
 import gradio as gr
 from llama_cpp import ChatCompletionRequestMessage
+from together import Together
+from together.types.chat_completions import ChatCompletionChoicesData
 
 from utils.database import get_instance, get_top_k_chunks
 from utils.prompt import design_prompt_raft
@@ -9,6 +11,23 @@ from utils.setup_chroma_db import setup_chroma_db
 from utils.vncorenlp_tokenizer import word_segment
 
 setup_chroma_db()
+
+
+client = Together()
+
+def create_chat_completion(chat_history: List[ChatCompletionRequestMessage]) -> ChatCompletionChoicesData:
+    response = client.chat.completions.create(
+        model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+        messages=chat_history,
+        max_tokens=512,
+        temperature=0.95,
+        top_p=0.7,
+        top_k=50,
+        repetition_penalty=1,
+        stop=["<|eot_id|>","<|eom_id|>"],
+        stream=True
+    )
+    return response
 
 with gr.Blocks() as demo:
     with gr.Row():
@@ -42,11 +61,12 @@ with gr.Blocks() as demo:
                 chat_history.append({"role": "user", "content": message})
 
                 chat_history.append({"role": "assistant", "content": ""})
-                for chunk in generate_response_local(temp_history):
-                    content_piece = chunk["choices"][0]["delta"].get("content", "")
-                    if content_piece:
-                        chat_history[-1]["content"] += content_piece
-                        yield "", chat_history, local_results
+                for chunk in create_chat_completion(temp_history):
+                    if hasattr(chunk, 'choices'):
+                      content_piece = chunk.choices[0].delta.content
+                      if content_piece:
+                          chat_history[-1]["content"] += content_piece
+                          yield "", chat_history, local_results
 
             msg.submit(respond, [msg, chatbot], [msg, chatbot, results])
 

@@ -78,11 +78,11 @@ def generate_response(prompt) -> str:
 
 
 def design_prompt_raft(results: List[Tuple[Document, float]], user_input) -> str:
-    prompt = ""
+    context = ""
 
     for tuple in results:
-        prompt += "<DOCUMENT>" + tuple[0].page_content.strip() + "</DOCUMENT>\n"
+        context += "<DOCUMENT>" + tuple[0].page_content.strip() + "</DOCUMENT>\n"
 
-    prompt += user_input
+    context += user_input
 
-    return prompt
+    return context

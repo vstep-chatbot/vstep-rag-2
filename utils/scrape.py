@@ -1,13 +1,14 @@
 import logging
 import os
 from os import getenv
+from typing import Optional
 
 from docling.document_converter import DocumentConverter
 from dotenv import load_dotenv
 from firecrawl import FirecrawlApp
 from langchain_core.documents import Document
 
-from config import CACHE_PATH, WEB_URL
+from config import CACHE_PATH
 
 load_dotenv()
 
@@ -25,7 +26,7 @@ def writeCache(filename: str, content: str) -> None:
         file.write(content)
 
 
-def scrape_website(url=WEB_URL, id=0, use_firecrawl=False) -> Document:
+def scrape_website(url, id=0, use_firecrawl=False) -> Optional[Document]:
     logger.info("Scraping: " + url)
 
     converter = DocumentConverter()
@@ -69,5 +70,31 @@ def scrape_website(url=WEB_URL, id=0, use_firecrawl=False) -> Document:
         except Exception as e:
             logger.error(f"Error Firecrawl: {e}")
             return None
+
+    return web_document
+
+def scrape_file(file_path) -> Optional[Document]:
+    logger.info("Scraping file: " + file_path)
+
+    web_document = None
+
+    if os.path.exists(os.path.join(CACHE_PATH, file_path.split("/")[-1])):
+        logger.info("Using cache")
+        with open(os.path.join(CACHE_PATH, file_path.split("/")[-1]), "r") as file:
+            content = file.read()
+            web_document = Document(page_content=content, metadata={"source": f"file://{file_path}"})
+            return web_document
+
+    try:
+        converter = DocumentConverter()
+        result = converter.convert(file_path)
+        markdown = result.document.export_to_markdown(strict_text=True, image_placeholder="").replace(
+            "<missing-text>\n", ""
+        )
+        writeCache(file_path.split("/")[-1], markdown)
+        web_document = Document(page_content=markdown, metadata={"source": f"file://{file_path}"})
+    except Exception as e:
+        logger.error(f"Error Scraping Docling: {e}")
+        return None
 
     return web_document
