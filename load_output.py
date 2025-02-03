@@ -4,8 +4,9 @@ import gradio as gr
 
 
 def load_output():
-  with open("evaluation/output1.json") as f:
-    return json.load(f)
+    with open("evaluation/output1.json") as f:
+        return json.load(f)
+
 
 with gr.Blocks(fill_width=True) as demo:
     full_data = gr.State(load_output())
@@ -13,8 +14,8 @@ with gr.Blocks(fill_width=True) as demo:
     current_index = gr.State(-1)
 
     with gr.Row():
-
         with gr.Column(scale=2):
+
             @gr.render(inputs=current_example)
             def show_question_and_answer(current_set):
                 input = current_set.get("input", "")
@@ -37,9 +38,9 @@ with gr.Blocks(fill_width=True) as demo:
                 for doc in chunks:
                     gr.Textbox(str(doc[1]), label=str(doc[0]), max_lines=10)
 
-
         with gr.Column(scale=1):
             with gr.Blocks():
+
                 def to_index(index, full_data):
                     index = max(0, min(index, len(full_data) - 1))
                     return [index - 1, full_data[index - 1]]
@@ -48,11 +49,13 @@ with gr.Blocks(fill_width=True) as demo:
                 gr.Button("To index").click(to_index, [num_input, full_data], [current_index, current_example])
 
             with gr.Blocks():
+
                 @gr.render(inputs=[current_index, full_data])
                 def show_index(current_index, full_data):
                     gr.Markdown(f"Example **{current_index + 1}** of **{len(full_data)}**", height=50)
 
             with gr.Column():
+
                 def to_start(current_index, current_example, full_data):
                     return [0, full_data[0]]
 
@@ -67,9 +70,17 @@ with gr.Blocks(fill_width=True) as demo:
                     prev_index = (current_index - 1) % len(full_data)
                     return [prev_index, full_data[prev_index]]
 
-                gr.Button("<| First").click(to_start, [current_index, current_example, full_data], [current_index, current_example])
-                gr.Button("<< Previous").click(prev_example, [current_index, current_example, full_data], [current_index, current_example])
-                gr.Button("Next >>").click(next_example, [current_index, current_example, full_data], [current_index, current_example])
-                gr.Button("Last |>").click(to_end, [current_index, current_example, full_data], [current_index, current_example])
+                gr.Button("<| First").click(
+                    to_start, [current_index, current_example, full_data], [current_index, current_example]
+                )
+                gr.Button("<< Previous").click(
+                    prev_example, [current_index, current_example, full_data], [current_index, current_example]
+                )
+                gr.Button("Next >>").click(
+                    next_example, [current_index, current_example, full_data], [current_index, current_example]
+                )
+                gr.Button("Last |>").click(
+                    to_end, [current_index, current_example, full_data], [current_index, current_example]
+                )
 
 demo.launch()
