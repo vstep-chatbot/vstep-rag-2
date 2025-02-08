@@ -4,8 +4,8 @@ import gradio as gr
 
 
 def load_output():
-    with open("evaluation/output1.json") as f:
-        return json.load(f)
+    with open("evaluation/output_raft_sgu.json", "r") as f:
+        return json.loads("[" + f.read()[:-2] + "]")
 
 
 with gr.Blocks(fill_width=True) as demo:

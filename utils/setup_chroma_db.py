@@ -5,6 +5,9 @@ from config import CHROMA_PATH, FORCE_FIRECRAWL_URLS, LOCAL_SOURCES_PATH, WEB_UR
 from phoBERT.chunking import split_document
 from utils.database import get_instance, is_chroma_db_empty
 from utils.scrape import scrape_file, scrape_website
+from langchain_text_splitters import MarkdownHeaderTextSplitter
+
+from utils.vncorenlp_tokenizer import word_segment
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -45,8 +48,9 @@ def setup_chroma_db():
 
         for root, dirs, files in os.walk(LOCAL_SOURCES_PATH):
             for file in files:
-                if file.endswith('.pdf') or file.endswith('.md'):
-                    file_path = os.path.join(root, file)
+                file_path = os.path.join(root, file)
+
+                if file.endswith(".pdf"):
                     logger.info(f"Processing file: {file_path}")
 
                     doc = scrape_file(file_path)
@@ -55,7 +59,21 @@ def setup_chroma_db():
                         continue
 
                     chunks = split_document(doc)
-
                     chroma_db.add_documents(chunks)
 
-    logger.info("Chroma database setup complete with " + str(len(chroma_db.get()['documents'])) + " documents.")
+                if file.endswith(".md"):
+                    with open(os.path.join(root, file), "r") as f:
+                        content = f.read()
+
+                        # documents = MarkdownTextSplitter(chunk_size=600, chunk_overlap=100).create_documents([content])
+                        documents = MarkdownHeaderTextSplitter(
+                            headers_to_split_on=[("#", "H1"), ("##", "H2")],
+                            strip_headers=False,
+                        ).split_text(content)
+                        for doc in documents:
+                            doc.metadata["source"] = f"file://{file_path}"
+                            doc.page_content = word_segment(doc.page_content)
+
+                        chroma_db.add_documents(documents)
+
+    logger.info("Chroma database setup complete with " + str(len(chroma_db.get()["documents"])) + " documents.")
