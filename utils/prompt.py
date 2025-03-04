@@ -34,7 +34,7 @@ def design_prompt(results: List[Tuple[Document, float]], user_input: str):
 local_model_name = os.getenv("LOCAL_MODEL")
 if local_model_name and not os.path.exists(local_model_name):
     hf_hub_download(repo_id=local_model_name, filename="unsloth.Q8_0.gguf", local_dir=".")
-local_model = Llama("unsloth.Q8_0.gguf", n_ctx=16392) if local_model_name else None
+local_model = Llama("unsloth.Q8_0.gguf", n_ctx=16384) if local_model_name else None
 
 online_model = ChatTogether(
     # model="meta-llama/Meta-Llama-3-8B-Instruct-Lite",
@@ -46,17 +46,20 @@ online_model = ChatTogether(
     max_tokens=1024,
 )
 
+
 # generate response
 def generate_response(prompt) -> str:
     if local_model:
         chat_history = [
             {
                 "role": "system",
-                "content": "Bạn là nhân viên hỗ trợ cho kỳ thi VSTEP, bạn trả lời câu hỏi và thuyết phục user đăng ký thi VSTEP.",
+                "content": "Sau đây là một cuộc trò chuyện với một trợ lý AI. Trợ lý này hữu ích, thông minh, thân thiện và trả lời súc tích, chuẩn xác.",
             },
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": prompt},
         ]
-        response : CreateChatCompletionResponse = local_model.create_chat_completion(chat_history)
+        response: CreateChatCompletionResponse = local_model.create_chat_completion(
+            chat_history, temperature=1.5, min_p=0.1
+        )
         if response and "choices" in response and response["choices"]:
             return response["choices"][0].get("message", {}).get("content", "") or ""
         return ""
@@ -74,7 +77,6 @@ def generate_response(prompt) -> str:
         # response = model.invoke(prompt)
         response_online = model.invoke(prompt).content
         return response_online
-
 
 
 def design_prompt_raft(results: List[Tuple[Document, float]], user_input) -> str:

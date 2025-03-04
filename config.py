@@ -23,28 +23,3 @@ Bạn đang đóng vai trò là một nhân viên hỗ trợ giải đáp thắc
 {context}
 
 """
-
-COT_PROMPT_TEMPLATE = """Câu hỏi: {question}
-Ngữ cảnh: {context}
-
-Trả lời câu hỏi này bằng cách sử dụng thông tin được cung cấp trong ngữ cảnh trên.
-
-Hướng dẫn:
-- Cung cấp lý giải từng bước về cách trả lời câu hỏi.
-- Giải thích những phần nào của ngữ cảnh có ý nghĩa và tại sao.
-- Sao chép và dán các câu liên quan từ ngữ cảnh trong ##begin_quote## và ##end_quote##.
-- Cung cấp một bản tóm tắt về cách bạn đạt được câu trả lời.
-- Kết thúc phản hồi của bạn bằng câu trả lời cuối cùng theo dạng <ANSWER>: $answer, câu trả lời nên ngắn gọn.
-- Bạn PHẢI bắt đầu câu trả lời cuối cùng bằng thẻ "<ANSWER>:".
-
-Đây là một vài ví dụ:
-
-Câu hỏi ví dụ: Phong trào nào đã được khơi nguồn từ vụ bắt giữ Jack Weinberg tại Sproul Plaza?
-Câu trả lời ví dụ: Để trả lời câu hỏi, chúng ta cần xác định phong trào đã được khơi nguồn từ vụ bắt giữ Jack Weinberg tại Sproul Plaza.
-Ngữ cảnh được cung cấp cho chúng ta thông tin cần thiết để xác định điều này.
-Đầu tiên, chúng ta tìm kiếm phần ngữ cảnh đề cập trực tiếp đến vụ bắt giữ Jack Weinberg.
-Chúng ta tìm thấy nó trong câu: ##begin_quote##Vụ bắt giữ Jack Weinberg, một cựu sinh viên Berkeley và chủ tịch của Campus CORE, tại Sproul Plaza, đã thúc đẩy một loạt các hành động phản đối chính thức và bất tuân dân sự do sinh viên lãnh đạo, mà cuối cùng đã làm nảy sinh Phong trào Tự do Ngôn luận##end_quote##.
-Từ câu này, chúng ta hiểu rằng vụ bắt giữ Jack Weinberg đã dẫn đến các hành động do sinh viên lãnh đạo, sau đó làm nảy sinh một phong trào cụ thể.
-Tên của phong trào được đề cập rõ ràng trong cùng câu là "Phong trào Tự do Ngôn luận".
-Do đó, dựa trên ngữ cảnh được cung cấp, chúng ta có thể kết luận rằng phong trào được khơi nguồn từ vụ bắt giữ Jack Weinberg tại Sproul Plaza là Phong trào Tự do Ngôn luận.
-<ANSWER>: Phong trào Tự do Ngôn luận"""

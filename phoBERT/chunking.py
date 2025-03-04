@@ -18,7 +18,7 @@ def split_document(document: Document) -> list[Document]:
     annotated_text = word_segment(document.page_content)
 
     documents = chunker.create_documents([annotated_text])
-    
+
     logging.info(f"Split document into {len(documents)} chunks.")
 
     for doc in documents:

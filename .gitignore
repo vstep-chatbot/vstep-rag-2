@@ -14,10 +14,12 @@ wheels/
 
 # Project ignore
 .env
-.cache/
+.cache/huggingface
+.cache/.*
 .chroma/
 .ropeproject/
 models
 unsloth.Q8_0.gguf
 VnCoreNLP-1.2.jar
 .gradio
+*.log
