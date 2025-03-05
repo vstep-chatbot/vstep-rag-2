@@ -18,6 +18,8 @@ def split_document(document: Document) -> list[Document]:
     annotated_text = word_segment(document.page_content)
 
     documents = chunker.create_documents([annotated_text])
+    
+    documents = [remove_underscore(doc) for doc in documents]
 
     logging.info(f"Split document into {len(documents)} chunks.")
 
@@ -25,3 +27,7 @@ def split_document(document: Document) -> list[Document]:
         doc.metadata["id"] = str(uuid4())
 
     return documents
+
+def remove_underscore(doc: Document) -> Document:
+    doc.page_content = doc.page_content.replace("_", " ")
+    return doc
